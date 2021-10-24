@@ -8,29 +8,78 @@
 #include <DS3231.h> // for RTC module
 #include <LiquidCrystal.h> // for LCD display
 
-/* the following is from the ELEGOO RTC demo */
-
+// define pins and initialize vars
+// RTC module - no pins need definition
 3231 clock;
 RTCDateTime dt;
+// LCD display
+// initialize the library with the numbers of the interface pins
+LiquidCrystal lcd(33, 30, 26, 29, 25, 22); // RS, E, D4-7 - all digital out
+// LED out
+// define pins for the red, green and blue LEDs
+#define RED_LED 6
+#define BLUE_LED 2
+#define GREEN_LED 4
+// Rotary encoders
+// Encoder 0
+ int CLK0 = 45;  
+ int DT0 = 42;   
+ int RotPosition0 = 0; 
+ int rotation0;  
+ int value0;
+ boolean LeftRight0;
+// Encoder 1
+ int CLK1 = 49;  
+ int DT1 = 46;   
+ int RotPosition1 = 0; 
+ int rotation1;  
+ int value1;
+ boolean LeftRight1;
+// Encoder 2
+ int CLK2 = 53;  
+ int DT2 = 50;   
+ int RotPosition2 = 0; 
+ int rotation2;  
+ int value2;
+ boolean LeftRight2; 
 
 void setup()
 {
+  // open serial comm for error-checking
   Serial.begin(9600);
-
-  Serial.println("Initialize RTC module");
+  
   // Initialize DS3231
+  Serial.println("Initialize RTC module");
   clock.begin();
 
-  
-  // Manual (YYYY, MM, DD, HH, II, SS
-  // clock.setDateTime(2016, 12, 9, 11, 46, 00);
-  
-  // Send sketch compiling time to Arduino
+  // Send sketch compiling time to Arduino to set the time
   clock.setDateTime(__DATE__, __TIME__);    
   /*
   Tips:This command will be executed every time when Arduino restarts. 
        Comment this line out to store the memory of DS3231 module
   */
+  
+  // Set up the LCD's number of columns and rows:
+  lcd.begin(16, 2);
+  // Print a message to the LCD.
+  lcd.print("Hello, World!");
+  
+  // Set up LED pins to output
+  pinMode(GREEN_LED, OUTPUT);
+  pinMode(RED_LED, OUTPUT);
+  pinMode(BLUE_LED, OUTPUT);
+  
+   // Set up rotary encoder inputs 
+   pinMode (CLK0,INPUT);
+   pinMode (DT0,INPUT);
+   pinMode (CLK1,INPUT);
+   pinMode (DT1,INPUT);
+   pinMode (CLK2,INPUT);
+   pinMode (DT2,INPUT);
+   
+   rotation0 = digitalRead(CLK);   
+   rotation1 = digitalRead(CLK);
+   rotation2 = digitalRead(CLK);
 }
 
 void loop()
@@ -46,21 +95,11 @@ void loop()
   Serial.print(dt.hour);   Serial.print(":");
   Serial.print(dt.minute); Serial.print(":");
   Serial.print(dt.second); Serial.println("");
-
+  
   delay(1000);
 }
 
 /* the following is from the ELEGOO LCD demo */
-
-// initialize the library with the numbers of the interface pins
-LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
-
-void setup() {
-  // set up the LCD's number of columns and rows:
-  lcd.begin(16, 2);
-  // Print a message to the LCD.
-  lcd.print("Hello, World!");
-}
 
 void loop() {
   // set the cursor to column 0, line 1
@@ -73,10 +112,7 @@ void loop() {
 /* the following is from the LED light strip demo
 https://gist.github.com/anonymous/d4fa3719478c3c5a9c321cc372e95407 */
 
-//define pins for the red, green and blue LEDs
-#define RED_LED 6
-#define BLUE_LED 5
-#define GREEN_LED 9
+
 
 //overall brightness value
 int brightness = 255;
@@ -89,10 +125,7 @@ int fadeSpeed = 10;
 
 
 void setup() {
-  //set up pins to output.
-  pinMode(GREEN_LED, OUTPUT);
-  pinMode(RED_LED, OUTPUT);
-  pinMode(BLUE_LED, OUTPUT);
+
 
 //Call the TurnOn method, wait, then call TurnOff
 TurnOn();
@@ -148,26 +181,6 @@ void loop(){
 /* the following is from the KY-040 demo
 https://create.arduino.cc/projecthub/vandenbrande/arduino-rotary-encoder-simple-example-ky-040-b78752 */
 
- int CLK = 9;  // Pin 9 to clk on encoder
- int DT = 8;  // Pin 8 to DT on encoder
- int RedLed = 4;// You do not need to use the leds. 
-                // you can take a look in the serial monitor if you dont have leds.
-                // there it will display values. 
- int GreenLed = 5;
- int BlueLed = 6;
- int RotPosition = 0; 
- int rotation;  
- int value;
- boolean LeftRight;
- void setup() { 
-   Serial.begin (9600);
-   pinMode (CLK,INPUT);
-   pinMode (DT,INPUT);
-   pinMode (RedLed, OUTPUT);
-   pinMode (GreenLed, OUTPUT);
-   pinMode (BlueLed, OUTPUT);
-   rotation = digitalRead(CLK);   
- } 
  void loop() { 
    value = digitalRead(CLK);
      if (value != rotation){ // we use the DT pin to find out which way we turning.
